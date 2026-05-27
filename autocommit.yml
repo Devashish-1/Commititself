@@ -1,0 +1,59 @@
+name: Auto commit
+
+on:
+  push:
+    branches:
+      - main
+
+  schedule:
+    # Runs every 2 hours, resulting in exactly 12 commits per day.
+    - cron: "0 */2 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  auto_commit:
+    runs-on: ubuntu-latest
+
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Modify last update
+        run: |
+          date -u '+%Y-%m-%dT%H:%M:%SZ' > LAST_UPDATED
+
+      - name: Commit changes
+        run: |
+          git config user.name "Devashish-1"
+          git config user.email "devashiisshh@gmail.com"
+
+          git add -A
+
+          messages=(
+            "chore(auto): 😂 keeping the streak alive"
+            "chore(auto): 😱 daily update"
+            "chore(auto): 👿 auto commit"
+            "chore(auto): 💩 updating timestamps"
+            "chore(auto): 🙏 green squares"
+            "chore(auto): 🙈 routine commit"
+            "chore(auto): 🐐 auto commit"
+            "chore(auto): 🤖 beep boop commit"
+            "chore(auto): 🟩 green square farming"
+            "chore(auto): 👻 ghost commit"
+          )
+
+          rand=$((RANDOM % ${#messages[@]}))
+
+          git commit -m "${messages[$rand]}" || echo "No changes to commit"
+
+      - name: Push changes
+        run: |
+          git pull --rebase origin main
+          git push
